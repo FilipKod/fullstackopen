@@ -57,6 +57,12 @@ const App = () => {
       )
     : persons;
 
+  const deletePersonHandler = (id) => {
+    personService.deletePerson(id).then(() => {
+      setPersons(persons.filter((person) => person.id !== id));
+    });
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -70,7 +76,7 @@ const App = () => {
         onChangeNumber={handleNewNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsList} />
+      <Persons persons={personsList} onDelete={deletePersonHandler} />
     </div>
   );
 };
