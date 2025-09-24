@@ -10,7 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterInput, setFilterInput] = useState("");
-  const [notifyMessage, setNotifyMessage] = useState(null);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialState) => setPersons(initialState));
@@ -24,9 +24,9 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
-  const showUpdateCreateMessage = (name) => {
-    setNotifyMessage(`a person [${name}] is added or a number is changed`);
-    setTimeout(() => setNotifyMessage(null), 5000);
+  const showNotification = (message, status) => {
+    setNotification({ message, status });
+    setTimeout(() => setNotification(null), 5000);
   };
 
   const addPersonHandler = (event) => {
@@ -44,7 +44,10 @@ const App = () => {
             setPersons(
               persons.map((el) => (el.id === person.id ? updatedData : el))
             );
-            showUpdateCreateMessage(updatedData.name);
+            showNotification(
+              `a person [${updatedData.name}] is added or a number is changed`,
+              "ok"
+            );
             setNewName("");
             setNewNumber("");
           });
@@ -64,7 +67,10 @@ const App = () => {
 
     personService.create(personObj).then((person) => {
       setPersons(persons.concat(person));
-      showUpdateCreateMessage(person.name);
+      showNotification(
+        `a person [${person.name}] is added or a number is changed`,
+        "ok"
+      );
       setNewName("");
       setNewNumber("");
     });
@@ -85,16 +91,24 @@ const App = () => {
     const confirmed = confirm(`Delete ${deletedPerson.name} ?`);
 
     if (confirmed) {
-      personService.deletePerson(id).then(() => {
-        setPersons(persons.filter((person) => person.id !== id));
-      });
+      personService
+        .deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch(() => {
+          showNotification(
+            `Information of [${deletedPerson.name}] has already been removed from server.`,
+            "error"
+          );
+        });
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notifyMessage} />
+      <Notification notification={notification} />
       <FilterInput value={filterInput} onChange={filerInputChange} />
       <h2>add new</h2>
       <Form
