@@ -23,6 +23,8 @@ function App() {
       country.name.common.toLowerCase().includes(value)
     );
 
+    console.log(filteredData);
+
     if (!value) return null;
 
     if (filteredData.length > 10) {
@@ -33,8 +35,8 @@ function App() {
       return (
         <ul>
           {filteredData.map((el) => (
-            <li key={String(el.idd.root + el.idd.suffixes.join(""))}>
-              {el.name.common}
+            <li key={el.cca2}>
+              {el.name.common} <button>show</button>
             </li>
           ))}
         </ul>
@@ -44,8 +46,6 @@ function App() {
     if (filteredData.length === 1) {
       const country = filteredData[0];
 
-      // console.log(country);
-      // country.flags.png
       return (
         <div>
           <h1>{country.name.common}</h1>
