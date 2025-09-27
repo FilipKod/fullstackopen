@@ -5,6 +5,7 @@ import axios from "axios";
 function App() {
   const [value, setValue] = useState("");
   const [countries, setCountries] = useState([]);
+  const [showBtn, setShowBtn] = useState(null);
 
   useEffect(() => {
     axios
@@ -18,12 +19,35 @@ function App() {
     setValue(event.target.value);
   };
 
+  const showSingleCountry = (country) => {
+    return (
+      <div>
+        <h1>{country.name.common}</h1>
+        <div>Capital {country.capital}</div>
+        <div>Area {country.area}</div>
+        <h2>Languages</h2>
+        <ul>
+          {Object.entries(country.languages).map(([key, value]) => (
+            <li key={key}>{value}</li>
+          ))}
+        </ul>
+        <img src={country.flags.png} />
+      </div>
+    );
+  };
+
+  const toggleButtonShow = (id) => {
+    if (showBtn === id) {
+      setShowBtn(null);
+    } else {
+      setShowBtn(id);
+    }
+  };
+
   const filteredCountries = () => {
     const filteredData = countries.filter((country) =>
       country.name.common.toLowerCase().includes(value)
     );
-
-    console.log(filteredData);
 
     if (!value) return null;
 
@@ -34,11 +58,18 @@ function App() {
     if (filteredData.length > 1 && filteredData.length <= 10) {
       return (
         <ul>
-          {filteredData.map((el) => (
-            <li key={el.cca2}>
-              {el.name.common} <button>show</button>
-            </li>
-          ))}
+          {filteredData.map((el) => {
+            const isSelected = showBtn === el.cca2;
+            return (
+              <li key={el.cca2}>
+                {el.name.common}{" "}
+                <button onClick={() => toggleButtonShow(el.cca2)}>
+                  {isSelected ? "hide" : "show"}
+                </button>
+                {isSelected && showSingleCountry(el)}
+              </li>
+            );
+          })}
         </ul>
       );
     }
@@ -46,20 +77,7 @@ function App() {
     if (filteredData.length === 1) {
       const country = filteredData[0];
 
-      return (
-        <div>
-          <h1>{country.name.common}</h1>
-          <div>Capital {country.capital}</div>
-          <div>Area {country.area}</div>
-          <h2>Languages</h2>
-          <ul>
-            {Object.entries(country.languages).map(([key, value]) => (
-              <li key={key}>{value}</li>
-            ))}
-          </ul>
-          <img src={country.flags.png} />
-        </div>
-      );
+      return showSingleCountry(country);
     }
   };
 
