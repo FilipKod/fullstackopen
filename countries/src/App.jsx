@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+const MAX_VISIBLE_COUNTRIES = 10;
 
 function App() {
   const [value, setValue] = useState("");
@@ -36,6 +37,7 @@ function App() {
 
   const valueChangeHandler = (event) => {
     setActualCountryBtn(null);
+    setWeatherData(null);
     const inputVal = event.target.value;
     setValue(inputVal);
 
@@ -82,11 +84,14 @@ function App() {
   const filteredCountriesShow = () => {
     if (!value) return null;
 
-    if (filteredCountries.length > 10) {
+    if (filteredCountries.length > MAX_VISIBLE_COUNTRIES) {
       return <p>Too many matches, specify another filter</p>;
     }
 
-    if (filteredCountries.length > 1 && filteredCountries.length <= 10) {
+    if (
+      filteredCountries.length > 1 &&
+      filteredCountries.length <= MAX_VISIBLE_COUNTRIES
+    ) {
       return (
         <ul>
           {filteredCountries.map((el) => {
