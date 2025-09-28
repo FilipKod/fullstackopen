@@ -20,19 +20,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (filteredCountries.length === 1) {
-      const country = filteredCountries[0];
-      const lat = country.capitalInfo.latlng[0];
-      const lon = country.capitalInfo.latlng[1];
-      const api_url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+    if (filteredCountries.length === 1 || actualCountryBtn) {
+      const country =
+        filteredCountries.length === 1
+          ? filteredCountries[0]
+          : filteredCountries.find((el) => el.cca2 === actualCountryBtn);
+
+      const api_url = `https://api.openweathermap.org/data/2.5/weather?q=${country.capital}&units=metric&appid=${API_KEY}`;
 
       axios.get(api_url).then((response) => {
         setWeatherData(response.data);
       });
     }
-  }, [filteredCountries]);
+  }, [filteredCountries, actualCountryBtn]);
 
   const valueChangeHandler = (event) => {
+    setActualCountryBtn(null);
     const inputVal = event.target.value;
     setValue(inputVal);
 
@@ -44,8 +47,6 @@ function App() {
   };
 
   const showSingleCountry = (country) => {
-    console.log(weatherData);
-
     if (!weatherData) return null;
 
     const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`;
@@ -62,7 +63,7 @@ function App() {
           ))}
         </ul>
         <img src={country.flags.png} />
-        <h2>Weather in {country.capital}</h2>
+        <h2>Weather in {weatherData.name}</h2>
         <div>Temperature {weatherData.main.temp} Celsius</div>
         <img src={weatherIconUrl} alt="weather icon" />
         <div>Wind {weatherData.wind.speed} m/s</div>
